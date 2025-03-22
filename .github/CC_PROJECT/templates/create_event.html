@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Create Event</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4">Create New Event</h2>
+                <form method="POST" class="needs-validation" novalidate>
+                    <!-- Event Title -->
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Event Title</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-heading"></i>
+                            </span>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                    </div>
+
+                    <!-- Event Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Event Description</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-align-left"></i>
+                            </span>
+                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Date and Time -->
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date and Time</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-calendar"></i>
+                            </span>
+                            <input type="datetime-local" class="form-control" id="date" name="date" required>
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </span>
+                            <input type="text" class="form-control" id="location" name="location" required>
+                        </div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-tag"></i>
+                            </span>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Select a category</option>
+                                <option value="Music">Music</option>
+                                <option value="Food & Drink">Food & Drink</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Education">Education</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Arts">Arts</option>
+                                <option value="Business">Business</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Maximum Participants -->
+                    <div class="mb-3">
+                        <label for="max_participants" class="form-label">Maximum Participants</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-users"></i>
+                            </span>
+                            <input type="number" class="form-control" id="max_participants" name="max_participants" min="1" required>
+                        </div>
+                    </div>
+
+                    <!-- Image URL -->
+                    <div class="mb-3">
+                        <label for="image_url" class="form-label">Event Image URL</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-image"></i>
+                            </span>
+                            <input type="url" class="form-control" id="image_url" name="image_url" placeholder="https://example.com/image.jpg">
+                        </div>
+                        <div class="form-text">Optional: Provide a URL for the event image</div>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Event Preview</h5>
+                        <div class="card">
+                            <div id="preview-image" class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-calendar-alt fa-3x text-muted"></i>
+                            </div>
+                            <div class="card-body">
+                                <h5 id="preview-title" class="card-title">Event Title</h5>
+                                <p id="preview-description" class="card-text">Event description will appear here...</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-users me-1"></i>
+                                        <span id="preview-participants">0</span> participants
+                                    </small>
+                                    <span class="badge bg-primary" id="preview-category">Category</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus-circle me-2"></i>Create Event
+                        </button>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get form elements
+    const titleInput = document.getElementById('title');
+    const descriptionInput = document.getElementById('description');
+    const maxParticipantsInput = document.getElementById('max_participants');
+    const categorySelect = document.getElementById('category');
+    const imageUrlInput = document.getElementById('image_url');
+
+    // Get preview elements
+    const previewTitle = document.getElementById('preview-title');
+    const previewDescription = document.getElementById('preview-description');
+    const previewParticipants = document.getElementById('preview-participants');
+    const previewCategory = document.getElementById('preview-category');
+    const previewImage = document.getElementById('preview-image');
+
+    // Update preview on input change
+    titleInput.addEventListener('input', function() {
+        previewTitle.textContent = this.value || 'Event Title';
+    });
+
+    descriptionInput.addEventListener('input', function() {
+        previewDescription.textContent = this.value || 'Event description will appear here...';
+    });
+
+    maxParticipantsInput.addEventListener('input', function() {
+        previewParticipants.textContent = this.value || '0';
+    });
+
+    categorySelect.addEventListener('change', function() {
+        previewCategory.textContent = this.value || 'Category';
+    });
+
+    imageUrlInput.addEventListener('input', function() {
+        if (this.value) {
+            previewImage.innerHTML = `<img src="${this.value}" alt="Event Preview" style="width: 100%; height: 100%; object-fit: cover;">`;
+        } else {
+            previewImage.innerHTML = '<i class="fas fa-calendar-alt fa-3x text-muted"></i>';
+        }
+    });
+
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="category-banner" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+    {% if category == 'music' %}
+        url('{{ url_for('static', filename='images/music-banner.jpg') }}')
+    {% elif category == 'food' %}
+        url('{{ url_for('static', filename='images/food-banner.jpg') }}')
+    {% elif category == 'sports' %}
+        url('{{ url_for('static', filename='images/sports-banner.jpg') }}')
+    {% elif category == 'education' %}
+        url('{{ url_for('static', filename='images/education-banner.jpg') }}')
+    {% endif %}">
+    <div class="container py-5 text-center text-white">
+        <div class="icon-circle mb-4 animate__animated animate__bounceIn">
+            {% if category == 'music' %}
+                <i class="fas fa-music"></i>
+            {% elif category == 'food' %}
+                <i class="fas fa-utensils"></i>
+            {% elif category == 'sports' %}
+                <i class="fas fa-running"></i>
+            {% elif category == 'education' %}
+                <i class="fas fa-graduation-cap"></i>
+            {% endif %}
+        </div>
+        <h1 class="display-4 animate__animated animate__fadeInUp">{{ info.title }}</h1>
+        <p class="lead animate__animated animate__fadeInUp animate__delay-1s">{{ info.description }}</p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <!-- Ongoing Events -->
+    <section class="mb-5">
+        <h2 class="text-center mb-4 section-title">
+            <i class="fas fa-calendar-day text-primary"></i> Ongoing Events
+        </h2>
+        {% if ongoing_events %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for event in ongoing_events %}
+            <div class="col">
+                <div class="card h-100 event-card">
+                    <div class="position-relative">
+                        <img src="{{ event.image_url or url_for('static', filename='images/default-event.jpg') }}" 
+                             class="card-img-top" alt="{{ event.title }}">
+                        <span class="badge bg-success position-absolute top-0 end-0 m-2">Ongoing</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event.title }}</h5>
+                        <p class="card-text">{{ event.description[:100] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i> {{ event.location }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="fas fa-users"></i> {{ event.max_participants }} spots
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn btn-primary w-100">
+                            <i class="fas fa-arrow-right"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted">
+            <i class="fas fa-calendar-times fa-3x mb-3"></i>
+            <p>No ongoing events in this category.</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Upcoming Events -->
+    <section class="mb-5">
+        <h2 class="text-center mb-4 section-title">
+            <i class="fas fa-calendar-alt text-primary"></i> Upcoming Events
+        </h2>
+        {% if upcoming_events %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for event in upcoming_events %}
+            <div class="col">
+                <div class="card h-100 event-card">
+                    <div class="position-relative">
+                        <img src="{{ event.image_url or url_for('static', filename='images/default-event.jpg') }}" 
+                             class="card-img-top" alt="{{ event.title }}">
+                        <span class="badge bg-primary position-absolute top-0 end-0 m-2">Upcoming</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event.title }}</h5>
+                        <p class="card-text">{{ event.description[:100] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar"></i> {{ event.date.strftime('%B %d, %Y') }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="fas fa-users"></i> {{ event.max_participants }} spots
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn btn-primary w-100">
+                            <i class="fas fa-arrow-right"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted">
+            <i class="fas fa-calendar-times fa-3x mb-3"></i>
+            <p>No upcoming events in this category.</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Past Events -->
+    <section class="mb-5">
+        <h2 class="text-center mb-4 section-title">
+            <i class="fas fa-history text-primary"></i> Past Events
+        </h2>
+        {% if past_events %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for event in past_events %}
+            <div class="col">
+                <div class="card h-100 event-card">
+                    <div class="position-relative">
+                        <img src="{{ event.image_url or url_for('static', filename='images/default-event.jpg') }}" 
+                             class="card-img-top" alt="{{ event.title }}">
+                        <span class="badge bg-secondary position-absolute top-0 end-0 m-2">Past</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event.title }}</h5>
+                        <p class="card-text">{{ event.description[:100] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar"></i> {{ event.date.strftime('%B %d, %Y') }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="fas fa-users"></i> {{ event.max_participants }} participants
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn btn-secondary w-100">
+                            <i class="fas fa-arrow-right"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted">
+            <i class="fas fa-calendar-times fa-3x mb-3"></i>
+            <p>No past events in this category.</p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+
+<style>
+.category-banner {
+    padding: 100px 0;
+    margin-bottom: 2rem;
+    margin-top: -1.5rem;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    position: relative;
+}
+
+.event-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.event-card img {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.event-card:hover img {
+    transform: scale(1.05);
+}
+
+.icon-circle {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(45deg, #007bff, #00bcd4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: transform 0.3s;
+}
+
+.icon-circle i {
+    font-size: 3rem;
+    color: white;
+}
+
+.badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+}
+
+.btn {
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #007bff, #00bcd4);
+    border: none;
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, #6c757d, #495057);
+    border: none;
+}
+
+.section-title {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 3rem;
+}
+
+.section-title:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(45deg, #007bff, #00bcd4);
+}
+</style>
+
+<!-- Add Animate.css for animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+{% endblock %} 

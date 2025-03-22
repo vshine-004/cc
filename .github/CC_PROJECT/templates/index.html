@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-white text-center py-5" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/static/images/hero-bg.jpg') center/cover;">
+    <div class="container py-5">
+        <h1 class="display-3 mb-4">Discover Amazing Events</h1>
+        <p class="lead mb-4">Join exciting events, meet new people, and create unforgettable memories.</p>
+        {% if not current_user.is_authenticated %}
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Register Now</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">Login</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Ongoing Events Section -->
+<div class="container my-5">
+    <h2 class="mb-4">
+        <i class="fas fa-calendar-day text-primary"></i> Ongoing Events
+    </h2>
+    {% if ongoing_events %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for event in ongoing_events %}
+        <div class="col">
+            <div class="card h-100 event-card">
+                <div class="position-relative">
+                    <img src="{{ event.image_url or url_for('static', filename='images/default-event.jpg') }}" 
+                         class="card-img-top" alt="{{ event.title }}">
+                    <span class="badge bg-success position-absolute top-0 end-0 m-2">Ongoing</span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ event.title }}</h5>
+                    <p class="card-text">{{ event.description[:100] }}...</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-map-marker-alt"></i> {{ event.location }}
+                        </small>
+                        <small class="text-muted">
+                            <i class="fas fa-users"></i> {{ event.max_participants }} spots
+                        </small>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn btn-primary w-100">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">No ongoing events at the moment.</p>
+    {% endif %}
+</div>
+
+<!-- Featured Categories -->
+<div class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">
+            <i class="fas fa-star text-warning"></i> Featured Categories
+        </h2>
+        <div class="row g-4">
+            <!-- Music Category -->
+            <div class="col-md-6 col-lg-3">
+                <div class="category-card text-center">
+                    <div class="icon-circle mb-4">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="h5">Music</h3>
+                        <p class="text-muted">Discover amazing concerts and live performances.</p>
+                        <a href="{{ url_for('category_events', category='music') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-arrow-right"></i> Browse Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Food Category -->
+            <div class="col-md-6 col-lg-3">
+                <div class="category-card text-center">
+                    <div class="icon-circle mb-4">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="h5">Food & Drink</h3>
+                        <p class="text-muted">Explore culinary festivals and tastings.</p>
+                        <a href="{{ url_for('category_events', category='food') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-arrow-right"></i> Browse Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sports Category -->
+            <div class="col-md-6 col-lg-3">
+                <div class="category-card text-center">
+                    <div class="icon-circle mb-4">
+                        <i class="fas fa-running"></i>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="h5">Sports</h3>
+                        <p class="text-muted">Join exciting sports tournaments and matches.</p>
+                        <a href="{{ url_for('category_events', category='sports') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-arrow-right"></i> Browse Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Education Category -->
+            <div class="col-md-6 col-lg-3">
+                <div class="category-card text-center">
+                    <div class="icon-circle mb-4">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="h5">Education</h3>
+                        <p class="text-muted">Attend workshops and learning sessions.</p>
+                        <a href="{{ url_for('category_events', category='education') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-arrow-right"></i> Browse Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Events Section -->
+<div class="container my-5">
+    <h2 class="mb-4">
+        <i class="fas fa-calendar-alt text-primary"></i> Upcoming Events
+    </h2>
+    {% if upcoming_events %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for event in upcoming_events %}
+        <div class="col">
+            <div class="card h-100 event-card">
+                <div class="position-relative">
+                    <img src="{{ event.image_url or url_for('static', filename='images/default-event.jpg') }}" 
+                         class="card-img-top" alt="{{ event.title }}">
+                    <span class="badge bg-primary position-absolute top-0 end-0 m-2">Upcoming</span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ event.title }}</h5>
+                    <p class="card-text">{{ event.description[:100] }}...</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar"></i> {{ event.date.strftime('%B %d, %Y') }}
+                        </small>
+                        <small class="text-muted">
+                            <i class="fas fa-users"></i> {{ event.max_participants }} spots
+                        </small>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn btn-primary w-100">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">No upcoming events at the moment.</p>
+    {% endif %}
+</div>
+
+<!-- Newsletter Section -->
+<div class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Stay Updated</h2>
+        <p class="lead mb-4">Subscribe to our newsletter for the latest events and updates.</p>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form class="d-flex gap-2">
+                    <input type="email" class="form-control" placeholder="Enter your email">
+                    <button type="submit" class="btn btn-light">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hero-section {
+    margin-top: -1.5rem;
+    background-attachment: fixed;
+}
+
+.event-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.event-card img {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.event-card:hover img {
+    transform: scale(1.05);
+}
+
+.category-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    padding: 2rem 1rem;
+    height: 100%;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.icon-circle {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(45deg, #007bff, #00bcd4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: transform 0.3s;
+}
+
+.icon-circle i {
+    font-size: 2rem;
+    color: white;
+}
+
+.category-card:hover .icon-circle {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+}
+
+.btn {
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #007bff, #00bcd4);
+    border: none;
+}
+
+.btn-outline-primary {
+    border: 2px solid #007bff;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(45deg, #007bff, #00bcd4);
+    border-color: transparent;
+    transform: translateY(-2px);
+}
+
+.newsletter-section {
+    background: linear-gradient(45deg, #007bff, #00bcd4);
+}
+
+.form-control {
+    border-radius: 50px;
+    padding: 0.75rem 1.5rem;
+}
+
+.section-title {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 3rem;
+}
+
+.section-title:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(45deg, #007bff, #00bcd4);
+}
+</style>
+{% endblock %}
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 

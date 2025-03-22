@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ event.title }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Event Image and Details -->
+    <div class="col-md-8 mb-4">
+        <div class="card h-100">
+            {% if event.image_url %}
+            <img src="{{ event.image_url }}" class="card-img-top" alt="{{ event.title }}" style="height: 400px; object-fit: cover;">
+            {% else %}
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                <i class="fas fa-calendar-alt fa-5x text-muted"></i>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <h1 class="card-title mb-4">{{ event.title }}</h1>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <i class="fas fa-calendar text-primary me-2"></i>
+                            {{ event.date.strftime('%B %d, %Y at %I:%M %p') }}
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                            {{ event.location }}
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-users text-success me-2"></i>
+                            {{ event.registrations|length }}/{{ event.max_participants }} participants
+                        </p>
+                        {% if event.category %}
+                        <p class="mb-2">
+                            <i class="fas fa-tag text-info me-2"></i>
+                            {{ event.category }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <i class="fas fa-user text-secondary me-2"></i>
+                            Organized by {{ event.organizer.name }}
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-clock text-warning me-2"></i>
+                            Created {{ event.created_at.strftime('%B %d, %Y') }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="mb-3">About This Event</h5>
+                    <p class="card-text">{{ event.description }}</p>
+                </div>
+
+                {% if current_user.is_authenticated %}
+                    {% if current_user.id == event.organizer_id %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        You are the organizer of this event.
+                    </div>
+                    {% else %}
+                        {% if is_registered %}
+                        <form action="{{ url_for('unregister_event', event_id=event.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-times-circle me-2"></i>Unregister
+                            </button>
+                        </form>
+                        {% else %}
+                            {% if event.registrations|length >= event.max_participants %}
+                            <button class="btn btn-secondary" disabled>
+                                <i class="fas fa-ban me-2"></i>Event Full
+                            </button>
+                            {% else %}
+                            <form action="{{ url_for('register_event', event_id=event.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-check-circle me-2"></i>Register Now
+                                </button>
+                            </form>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Please <a href="{{ url_for('login') }}" class="alert-link">login</a> to register for this event.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+        <!-- Event Status Card -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Event Status</h5>
+                {% set now = now() %}
+                {% if event.date <= now and event.date + timedelta(days=1) >= now %}
+                <div class="alert alert-success">
+                    <i class="fas fa-clock me-2"></i>Ongoing
+                </div>
+                {% elif event.date > now %}
+                <div class="alert alert-info">
+                    <i class="fas fa-calendar me-2"></i>Upcoming
+                </div>
+                {% else %}
+                <div class="alert alert-secondary">
+                    <i class="fas fa-history me-2"></i>Past Event
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Share Event Card -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Share Event</h5>
+                <div class="d-flex justify-content-around">
+                    <a href="#" class="btn btn-outline-primary">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="btn btn-outline-info">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="btn btn-outline-success">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="#" class="btn btn-outline-danger">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Similar Events Card -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Similar Events</h5>
+                {% if event.category %}
+                <div class="list-group">
+                    {% for similar_event in similar_events %}
+                    <a href="{{ url_for('event_detail', event_id=similar_event.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ similar_event.title }}</h6>
+                            <small>{{ similar_event.date.strftime('%b %d') }}</small>
+                        </div>
+                        <small class="text-muted">{{ similar_event.location }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No similar events found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Comments Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Comments</h5>
+                {% if current_user.is_authenticated %}
+                <form class="mb-4">
+                    <div class="form-group">
+                        <textarea class="form-control" rows="3" placeholder="Write a comment..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">
+                        <i class="fas fa-paper-plane me-2"></i>Post Comment
+                    </button>
+                </form>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Please <a href="{{ url_for('login') }}" class="alert-link">login</a> to leave a comment.
+                </div>
+                {% endif %}
+
+                <!-- Comments List -->
+                <div class="comments-list">
+                    <!-- Sample Comment -->
+                    <div class="d-flex mb-3">
+                        <img src="https://via.placeholder.com/40" class="rounded-circle me-3" alt="User">
+                        <div>
+                            <h6 class="mb-1">John Doe</h6>
+                            <p class="mb-1">Great event! Looking forward to it.</p>
+                            <small class="text-muted">2 hours ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
